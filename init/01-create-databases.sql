@@ -1,0 +1,7 @@
+CREATE DATABASE filial_west;
+CREATE DATABASE filial_east;
+CREATE DATABASE dw_retail;
+
+GRANT ALL PRIVILEGES ON DATABASE filial_west TO postgres;
+GRANT ALL PRIVILEGES ON DATABASE filial_east TO postgres;
+GRANT ALL PRIVILEGES ON DATABASE dw_retail TO postgres;

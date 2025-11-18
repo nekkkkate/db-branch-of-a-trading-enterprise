@@ -1,0 +1,113 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16.9
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: postgres
+    ports:
+      - "5434:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d
+    networks:
+      - filialnet
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  flyway_west:
+    image: flyway/flyway:11.14.1
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      FLYWAY_URL: jdbc:postgresql://postgres:5432/filial_west
+      FLYWAY_USER: postgres
+      FLYWAY_PASSWORD: password
+      FLYWAY_LOCATIONS: filesystem:/flyway/sql/filial
+      FLYWAY_BASELINE_ON_MIGRATE: true
+      FLYWAY_SQL_MIGRATION_PREFIX: V
+      FLYWAY_SQL_MIGRATION_SEPARATOR: __
+      FLYWAY_SQL_MIGRATION_SUFFIXES: .sql
+    volumes:
+      - ./flyway/sql/filial:/flyway/sql/filial
+    networks:
+      - filialnet
+    command: migrate
+
+  flyway_east:
+    image: flyway/flyway:11.14.1
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      FLYWAY_URL: jdbc:postgresql://postgres:5432/filial_east
+      FLYWAY_USER: postgres
+      FLYWAY_PASSWORD: password
+      FLYWAY_LOCATIONS: filesystem:/flyway/sql/filial
+      FLYWAY_BASELINE_ON_MIGRATE: true
+      FLYWAY_SQL_MIGRATION_PREFIX: V
+      FLYWAY_SQL_MIGRATION_SEPARATOR: __
+      FLYWAY_SQL_MIGRATION_SUFFIXES: .sql
+    volumes:
+      - ./flyway/sql/filial:/flyway/sql/filial
+    networks:
+      - filialnet
+    command: migrate
+
+  flyway_dwh:
+    image: flyway/flyway:11.14.1
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      FLYWAY_URL: jdbc:postgresql://postgres:5432/dw_retail
+      FLYWAY_USER: postgres
+      FLYWAY_PASSWORD: password
+      FLYWAY_LOCATIONS: filesystem:/flyway/sql/dwh
+      FLYWAY_BASELINE_ON_MIGRATE: true
+      FLYWAY_SQL_MIGRATION_PREFIX: V
+      FLYWAY_SQL_MIGRATION_SEPARATOR: __
+      FLYWAY_SQL_MIGRATION_SUFFIXES: .sql
+    volumes:
+      - ./flyway/sql/dwh:/flyway/sql/dwh
+    networks:
+      - filialnet
+    command: migrate
+
+  flyway_mart:
+    image: flyway/flyway:11.14.1
+    depends_on:
+      postgres:
+        condition: service_healthy
+      flyway_dwh:
+        condition: service_completed_successfully
+    environment:
+      FLYWAY_URL: jdbc:postgresql://postgres:5432/dw_retail
+      FLYWAY_USER: postgres
+      FLYWAY_PASSWORD: password
+      FLYWAY_LOCATIONS: filesystem:/flyway/sql/mart
+      FLYWAY_BASELINE_ON_MIGRATE: true
+      FLYWAY_VALIDATE_ON_MIGRATE: false
+      FLYWAY_CLEAN_DISABLED: false
+      FLYWAY_SQL_MIGRATION_PREFIX: V
+      FLYWAY_SQL_MIGRATION_SEPARATOR: __
+      FLYWAY_SQL_MIGRATION_SUFFIXES: .sql
+    volumes:
+      - ./flyway/sql/mart:/flyway/sql/mart
+    networks:
+      - filialnet
+    command: migrate
+
+volumes:
+  pgdata:
+
+networks:
+  filialnet:
