@@ -100,6 +100,8 @@ services:
       FLYWAY_SQL_MIGRATION_PREFIX: V
       FLYWAY_SQL_MIGRATION_SEPARATOR: __
       FLYWAY_SQL_MIGRATION_SUFFIXES: .sql
+      FLYWAY_SCHEMAS: mart
+      FLYWAY_BASELINE_VERSION: 1
     volumes:
       - ./flyway/sql/mart:/flyway/sql/mart
     networks:
