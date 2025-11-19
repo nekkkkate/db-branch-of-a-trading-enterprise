@@ -4,7 +4,7 @@
 
 ```bash
 docker compose up -d postgres flyway_west flyway_east
-python app/seed_retail.py
+python seed_retail.py
 docker compose up flyway_dwh flyway_mar
 ```
 
