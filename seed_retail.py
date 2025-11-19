@@ -12,7 +12,7 @@ load_dotenv()
 DB_USER = os.getenv("POSTGRES_USER", "postgres")
 DB_PASSWORD = os.getenv("POSTGRES_PASSWORD", "password")
 DB_HOST = os.getenv("DB_HOST", "localhost")
-DB_PORT = os.getenv("DB_PORT", "5436")
+DB_PORT = os.getenv("DB_PORT", "5432")
 
 DBS_TO_SEED = [db.strip() for db in os.getenv("DBS_TO_SEED", "filial_west,filial_east").split(",") if db.strip()]
 
