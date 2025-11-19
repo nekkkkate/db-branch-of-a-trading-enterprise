@@ -1,5 +1,13 @@
 # db-branch-of-a-trading-enterprise
 
+инструкция по запуску:
+
+```bash
+docker compose up -d postgres flyway_west flyway_east
+python app/seed_retail.py
+docker compose up flyway_dwh flyway_mar
+```
+
 ## Лабораторная работа №1. Разработка базы данных «Филиал» как источника данных.
 
 В данной лабораторной работе требуется разработать прототип базы данных филиала
