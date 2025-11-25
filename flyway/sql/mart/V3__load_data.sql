@@ -120,7 +120,7 @@ BEGIN
         (SELECT COUNT(DISTINCT branch_key) FROM mart.fact_weekly_sales)::INTEGER as total_branches,
         (SELECT COUNT(DISTINCT product_key) FROM mart.fact_weekly_sales)::INTEGER as total_products,
         (SELECT COUNT(*) FROM mart.fact_weekly_sales) as total_records,
-        (SELECT MAX(last_update) FROM mart.fact_weekly_sales) as last_update;
+        (SELECT MAX(fws.last_update) FROM mart.fact_weekly_sales fws) as last_update;
 END;
 $$;
 
